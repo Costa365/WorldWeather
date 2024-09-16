@@ -1,0 +1,67 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Weather Map</title>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map { 
+            height:98vh;
+        }
+        .weather-data {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="weather-data"  class="weather-data" hx-get="/get-weather" hx-trigger="load">
+        Loading weather data...
+    </div>
+
+    <script>
+        function getTempColor(temp) {
+            if (temp < 0) {
+                return 'rgba(90, 90, 250, 0.8)';
+            } else if (temp < 10) {
+                return 'rgba(90, 250, 90, 0.8)';
+            } else if (temp < 20) {
+                return 'rgba(250, 250, 90, 0.8)';
+            } else if (temp < 30) {
+                return 'rgba(250, 175, 90, 0.8)';
+            } else if (temp < 40) {
+                return 'rgba(250, 90, 90, 0.8)';
+            } else {
+                return 'rgba(255, 0, 0, 0.8)';
+            }
+        } 
+
+        let map = L.map('map').setView([20, 20], 3);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
+	        maxZoom: 8
+        }).addTo(map);
+
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            if (event.detail.target.id === 'weather-data') {
+                const weatherData = JSON.parse(event.detail.target.textContent);
+                weatherData.forEach(city => {
+
+                    let label = L.divIcon({
+                        className: 'temperature-label',
+                        html: `<div style="background-color: ${getTempColor(city.temp)}; padding: 1px; border-radius: 8px; text-align: center">${city.temp}</div>`,
+                        iconSize: [24, 18]
+                    });
+                    L.marker([city.lat, city.lon], { icon: label }).addTo(map).
+                        bindPopup(`<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}`);
+                });
+              
+            }
+        });
+    </script>
+</body>
+</html>
