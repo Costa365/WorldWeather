@@ -9,6 +9,7 @@ services:
       - .:/app
     environment:
       - OPENWEATHERMAP_API_KEY=${OPENWEATHERMAP_API_KEY}
+      - TZ=UTC
     command: uvicorn main:app --host 0.0.0.0 --reload
 
 volumes:

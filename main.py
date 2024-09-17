@@ -1,16 +1,20 @@
 # main.py
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.triggers.date import DateTrigger
+from datetime import datetime
 from cities import cities
 import httpx
 import os
-import threading
 
 from pathlib import Path
 
 app = FastAPI()
+scheduler = AsyncIOScheduler()
 
 # Create 'static' directory if it doesn't exist
 static_dir = Path("static")
@@ -27,6 +31,9 @@ OPENWEATHERMAP_API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 
 weather_data = {}
 
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse('static/favicon.ico')
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -35,29 +42,34 @@ async def read_root(request: Request):
 
 @app.get("/get-weather")
 async def get_weather():
-    if not weather_data:
-        async with httpx.AsyncClient() as client:
-            for city in cities:
-                url = f"http://api.openweathermap.org/data/2.5/weather?lat={city['lat']}&lon={city['lon']}&appid={OPENWEATHERMAP_API_KEY}&units=metric"
-                response = await client.get(url)
-                if response.status_code == 200:
-                    data = response.json()
-                    weather_data[city["name"]] = {
-                        "name": city["name"],
-                        "lat": city["lat"],
-                        "lon": city["lon"],
-                        "temp": round(data["main"]["temp"]),
-                        "humidity": data["main"]["humidity"],
-                        "description": data["weather"][0]["description"]
-                    }
     return list(weather_data.values())
 
 
-def start_server():
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+async def update_weather():
+    print("Updating weather data...", flush=True)
+    async with httpx.AsyncClient() as client:
+        for city in cities:
+            url = f"http://api.openweathermap.org/data/2.5/weather?lat={city['lat']}&lon={city['lon']}&appid={OPENWEATHERMAP_API_KEY}&units=metric"
+            response = await client.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                weather_data[city["name"]] = {
+                    "name": city["name"],
+                    "lat": city["lat"],
+                    "lon": city["lon"],
+                    "temp": round(data["main"]["temp"]),
+                    "humidity": data["main"]["humidity"],
+                    "description": data["weather"][0]["description"]
+                }
 
 
-if __name__ == "__main__":
-    server_thread = threading.Thread(target=start_server)
-    server_thread.start()
+@app.on_event("startup")
+async def startup_event():
+    scheduler.add_job(update_weather, DateTrigger(run_date=datetime.now()))
+    scheduler.add_job(update_weather, IntervalTrigger(minutes=30))
+    scheduler.start()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    scheduler.shutdown()
