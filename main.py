@@ -46,9 +46,9 @@ async def get_weather():
 
 
 async def update_weather():
-    print("Updating weather data...", flush=True)
+    print(f"Updating weather data {update_weather.count}", flush=True)
     async with httpx.AsyncClient() as client:
-        for city in cities:
+        for city in cities[update_weather.count*60:(update_weather.count+1)*60]:
             url = f"http://api.openweathermap.org/data/2.5/weather?lat={city['lat']}&lon={city['lon']}&appid={OPENWEATHERMAP_API_KEY}&units=metric"
             response = await client.get(url)
             if response.status_code == 200:
@@ -61,12 +61,14 @@ async def update_weather():
                     "humidity": data["main"]["humidity"],
                     "description": data["weather"][0]["description"]
                 }
+    update_weather.count = (update_weather.count + 1) % 5
 
+update_weather.count = 0
 
 @app.on_event("startup")
 async def startup_event():
     scheduler.add_job(update_weather, DateTrigger(run_date=datetime.now()))
-    scheduler.add_job(update_weather, IntervalTrigger(minutes=30))
+    scheduler.add_job(update_weather, IntervalTrigger(minutes=6))
     scheduler.start()
 
 
