@@ -45,6 +45,18 @@ async def get_weather():
     return list(weather_data.values())
 
 
+def wind_direction(deg):
+    directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+                  "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+    idx = int((deg + 11.25) / 22.5) % 16
+    return directions[idx]
+
+
+def format_wind(speed, deg):
+    direction = wind_direction(deg)
+    return f"{speed} km/h {direction}"
+
+
 async def update_weather():
     print(f"Updating weather data {update_weather.count}", flush=True)
     async with httpx.AsyncClient() as client:
@@ -59,7 +71,9 @@ async def update_weather():
                     "lon": city["lon"],
                     "temp": round(data["main"]["temp"]),
                     "humidity": data["main"]["humidity"],
-                    "description": data["weather"][0]["description"]
+                    "wind": format_wind(data["wind"]["speed"], data["wind"]["deg"]),
+                    "localtime": data["dt"]+data["timezone"],
+                    "description": data["weather"][0]["description"].title()
                 }
     update_weather.count = (update_weather.count + 1) % 5
 
