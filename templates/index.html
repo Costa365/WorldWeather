@@ -51,14 +51,14 @@
                 const weatherData = JSON.parse(event.detail.target.textContent);
                 weatherData.forEach(city => {
                     let localtime = new Date(city.localtime * 1000);
-                    let timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()}/${localtime.getUTCFullYear()} ${localtime.getUTCHours()}:${localtime.getUTCMinutes()}`
+                    let timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()}/${localtime.getUTCFullYear()-2000} ${String(localtime.getUTCHours()).padStart(2, "0")}:${String(localtime.getUTCMinutes()).padStart(2, "0")}`
                     let label = L.divIcon({
                         className: 'temperature-label',
                         html: `<div style="background-color: ${getTempColor(city.temp)}; padding: 1px; border-radius: 8px; text-align: center">${city.temp}</div>`,
                         iconSize: [24, 18]
                     });
                     L.marker([city.lat, city.lon], { icon: label }).addTo(map).
-                        bindPopup(`<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Local Time: ${timestr}`);
+                        bindPopup(`<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Time: ${timestr}`);
                 });
               
             }
