@@ -1,20 +1,15 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Weather Map</title>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <title>World Weather</title>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div id="map"></div>
-    <div id="weather-data" hx-get="/get-weather" hx-trigger="load">
-        Loading weather data...
-    </div>
 
     <script>
         function getTempColor(temp) {
@@ -39,23 +34,35 @@
 	        maxZoom: 8
         }).addTo(map);
 
-        document.body.addEventListener('htmx:afterSwap', function(event) {
-            if (event.detail.target.id === 'weather-data') {
-                const weatherData = JSON.parse(event.detail.target.textContent);
+        // Fetch weather data and display it on the map
+        async function fetchWeatherData() {
+            try {
+                const response = await fetch('/get-weather');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch weather data');
+                }
+
+                const weatherData = await response.json();
                 weatherData.forEach(city => {
                     let localtime = new Date(city.localtime * 1000);
-                    let timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()}/${localtime.getUTCFullYear()-2000} ${String(localtime.getUTCHours()).padStart(2, "0")}:${String(localtime.getUTCMinutes()).padStart(2, "0")}`
+                    let timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()}/${localtime.getUTCFullYear() - 2000} ${String(localtime.getUTCHours()).padStart(2, "0")}:${String(localtime.getUTCMinutes()).padStart(2, "0")}`;
+
                     let label = L.divIcon({
                         className: 'temperature-label',
                         html: `<div style="background-color: ${getTempColor(city.temp)}; padding: 1px; border-radius: 8px; text-align: center">${city.temp}</div>`,
                         iconSize: [24, 18]
                     });
-                    L.marker([city.lat, city.lon], { icon: label }).addTo(map).
-                        bindPopup(`<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Time: ${timestr}`);
+
+                    L.marker([city.lat, city.lon], { icon: label }).addTo(map)
+                        .bindPopup(`<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Time: ${timestr}`);
                 });
-              
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
             }
-        });
+        }
+
+        // Call fetchWeatherData once the map is initialized
+        document.addEventListener("DOMContentLoaded", fetchWeatherData);
     </script>
 </body>
 </html>
