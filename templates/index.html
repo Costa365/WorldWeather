@@ -8,18 +8,11 @@
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <style>
-        #map { 
-            height:98vh;
-        }
-        .weather-data {
-            visibility: hidden;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div id="map"></div>
-    <div id="weather-data"  class="weather-data" hx-get="/get-weather" hx-trigger="load">
+    <div id="weather-data" hx-get="/get-weather" hx-trigger="load">
         Loading weather data...
     </div>
 
