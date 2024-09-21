@@ -16,24 +16,23 @@ from pathlib import Path
 app = FastAPI()
 scheduler = AsyncIOScheduler()
 
-# Create 'static' directory if it doesn't exist
 static_dir = Path("static")
 static_dir.mkdir(exist_ok=True)
 
-# Mount the static directory only if it exists and is not empty
 if static_dir.exists() and any(static_dir.iterdir()):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-# Get the API key from environment variable
 OPENWEATHERMAP_API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 
 weather_data = {}
 
+
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
     return FileResponse('static/favicon.ico')
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -58,26 +57,33 @@ def format_wind(speed, deg):
 
 
 async def update_weather():
-    print(f"Updating weather data {update_weather.count}", flush=True)
+    dt = datetime.now()
+    dts = dt.strftime("%d/%m/%Y %H:%M:%S")
+    print(f"{dts} Updating weather data {update_weather.count}", flush=True)
     async with httpx.AsyncClient() as client:
         for city in cities[update_weather.count*60:(update_weather.count+1)*60]:
             url = f"http://api.openweathermap.org/data/2.5/weather?lat={city['lat']}&lon={city['lon']}&appid={OPENWEATHERMAP_API_KEY}&units=metric"
-            response = await client.get(url)
-            if response.status_code == 200:
-                data = response.json()
-                weather_data[city["name"]] = {
-                    "name": city["name"],
-                    "lat": city["lat"],
-                    "lon": city["lon"],
-                    "temp": round(data["main"]["temp"]),
-                    "humidity": data["main"]["humidity"],
-                    "wind": format_wind(data["wind"]["speed"], data["wind"]["deg"]),
-                    "localtime": data["dt"]+data["timezone"],
-                    "description": data["weather"][0]["description"].title()
-                }
+            try:
+                response = await client.get(url)
+                if response.status_code == 200:
+                    data = response.json()
+                    weather_data[city["name"]] = {
+                        "name": city["name"],
+                        "lat": city["lat"],
+                        "lon": city["lon"],
+                        "temp": round(data["main"]["temp"]),
+                        "humidity": data["main"]["humidity"],
+                        "wind": format_wind(data["wind"]["speed"], data["wind"]["deg"]),
+                        "localtime": data["dt"]+data["timezone"],
+                        "description": data["weather"][0]["description"].title()
+                    }
+            except Exception as e:
+                print(f"An error occurred accessing the API: {e}", flush=True)
+                return
     update_weather.count = (update_weather.count + 1) % 5
 
 update_weather.count = 0
+
 
 @app.on_event("startup")
 async def startup_event():
