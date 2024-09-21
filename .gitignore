@@ -46,7 +46,3 @@ Thumbs.db
 
 # Docker
 docker-compose.override.yml
-
-# Project specific
-static/*
-!static/.gitkeep
