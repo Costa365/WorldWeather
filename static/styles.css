@@ -34,3 +34,41 @@ html, body {
   background-color: rgba(193, 193, 238, 0.9);
 }
 
+.logo {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 80px;
+  height: auto;
+  border: 5px;
+  border-radius: 6px;;
+  z-index: 1000;
+  background-color: rgba(38, 38, 38, 0.7);
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  width: 92%;
+  height: auto;
+  margin: 4%;
+}
+
+.logo button {
+  width: 92%;
+  height: auto;
+  margin: 4%;
+  background-color: rgb(110, 248, 197);
+}
+
+/* CSS */
+.logo button {
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
+   background-origin: border-box;
+  user-select: none;
+  touch-action: manipulation;
+}

@@ -10,6 +10,7 @@ from datetime import datetime
 from cities import cities
 import httpx
 import os
+import math
 
 from pathlib import Path
 
@@ -27,6 +28,9 @@ templates = Jinja2Templates(directory="templates")
 OPENWEATHERMAP_API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 
 weather_data = {}
+
+MAX_API_CALLS = 60
+BATCHES = math.ceil(len(cities)/MAX_API_CALLS)
 
 
 @app.get('/favicon.ico', include_in_schema=False)
@@ -80,7 +84,7 @@ async def update_weather():
             except Exception as e:
                 print(f"An error occurred accessing the API: {e}", flush=True)
                 return
-    update_weather.count = (update_weather.count + 1) % 5
+    update_weather.count = (update_weather.count + 1) % (BATCHES)
 
 update_weather.count = 0
 
