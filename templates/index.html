@@ -11,8 +11,6 @@
 <body>
     <div id="map"></div>
 
-    <div class="logo"><img src="/static/logo.png" alt="Logo"><button onclick="fetchWeatherData()">Update</button></div>
-
     <script>
         function getTempColor(temp) {
             if (temp < 0) {
@@ -75,9 +73,9 @@
         document.addEventListener("DOMContentLoaded", fetchWeatherData);
 
         // Update the weather data every 10 minutes
-        //setInterval(() => {
-        //    fetchWeatherData();
-        //}, 60000*10);
+        setInterval(() => {
+            fetchWeatherData();
+        }, 60000*10);
 
     </script>
 </body>
