@@ -9,6 +9,7 @@ Can be accessed at [https://world.costa365.site](https://world.costa365.site).
 - Real-time weather data for major world cities
 - Interactive map with weather information popups
 - Asynchronous data loading with fetch
+- Web page periodicallyy fetches latest weather data
 - Dockerized application for easy deployment
 
 ## Prerequisites
@@ -39,7 +40,7 @@ Before you begin, ensure you have met the following requirements:
    docker-compose up --build
    ```
 
-4. Once the containers are running, open your web browser and navigate to `http://localhost:8000` to view the application.
+4. Once the containers are running, open your web browser and navigate to `http://localhost:8020` to view the application.
 
 ## Usage
 

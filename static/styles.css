@@ -34,6 +34,10 @@ html, body {
   background-color: rgba(193, 193, 238, 0.9);
 }
 
+.leaflet-popup-close-button {
+  color: rgba(128, 128, 128, 1) !important;
+}
+
 .logo {
   position: absolute;
   top: 6px;

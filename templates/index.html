@@ -58,6 +58,7 @@
                     let content = `<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Time: ${timestr}`;
 
                     if(city.name in cities) {
+                        cities[city.name].setIcon(label);
                         cities[city.name].bindPopup(content);
                     } else {
                         cities[city.name] = L.marker([city.lat, city.lon], { icon: label }).addTo(map)
