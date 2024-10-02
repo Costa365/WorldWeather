@@ -12,21 +12,29 @@
     <div id="map"></div>
 
     <script>
-        function getTempColor(temp) {
-            if (temp < 0) {
-                return 'rgba(90, 90, 250, 0.8)';
-            } else if (temp < 10) {
-                return 'rgba(90, 250, 90, 0.8)';
-            } else if (temp < 20) {
-                return 'rgba(250, 250, 90, 0.8)';
-            } else if (temp < 30) {
-                return 'rgba(250, 175, 90, 0.8)';
-            } else if (temp < 40) {
-                return 'rgba(250, 90, 90, 0.8)';
-            } else {
-                return 'rgba(255, 0, 0, 0.8)';
-            }
-        } 
+
+	function getTempColor(temp) {
+    	    const colors = [
+                { max: -20, color: 'rgba(0, 0, 139, 0.8)' },    // Dark blue
+                { max: -15, color: 'rgba(0, 0, 255, 0.8)' },    // Blue
+                { max: -10, color: 'rgba(70, 130, 180, 0.8)' }, // Steel blue
+                { max: -5, color: 'rgba(135, 206, 235, 0.8)' }, // Sky blue
+                { max: 0, color: 'rgba(173, 216, 230, 0.8)' },  // Light blue
+                { max: 5, color: 'rgba(144, 238, 144, 0.8)' },  // Light green
+                { max: 10, color: 'rgba(60, 179, 113, 0.8)' },  // Medium sea green
+                { max: 15, color: 'rgba(34, 139, 34, 0.8)' },   // Forest green
+                { max: 20, color: 'rgba(173, 255, 47, 0.8)' },  // Yellow-green
+                { max: 25, color: 'rgba(255, 255, 0, 0.8)' },   // Yellow
+                { max: 30, color: 'rgba(255, 165, 0, 0.8)' },   // Orange
+                { max: 35, color: 'rgba(255, 99, 71, 0.8)' },   // Tomato
+                { max: 40, color: 'rgba(255, 69, 0, 0.8)' },    // Orange-red
+                { max: 45, color: 'rgba(255, 0, 0, 0.8)' },     // Red
+                { max: Infinity, color: 'rgba(139, 0, 0, 0.8)' }// Dark red for > 45
+            ];
+    
+            return colors.find(c => temp <= c.max).color;
+        }
+
 
         let map = L.map('map').setView([20, 20], 3);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {

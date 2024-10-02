@@ -30,6 +30,7 @@ OPENWEATHERMAP_API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 weather_data = {}
 
 MAX_API_CALLS = 60
+API_QUERY_INTERVAL = 5
 BATCHES = math.ceil(len(cities)/MAX_API_CALLS)
 
 
@@ -65,7 +66,7 @@ async def update_weather():
     dts = dt.strftime("%d/%m/%Y %H:%M:%S")
     print(f"{dts} Updating weather data {update_weather.count}", flush=True)
     async with httpx.AsyncClient() as client:
-        for city in cities[update_weather.count*60:(update_weather.count+1)*60]:
+        for city in cities[update_weather.count*MAX_API_CALLS:(update_weather.count+1)*MAX_API_CALLS]:
             url = f"http://api.openweathermap.org/data/2.5/weather?lat={city['lat']}&lon={city['lon']}&appid={OPENWEATHERMAP_API_KEY}&units=metric"
             try:
                 response = await client.get(url)
@@ -92,7 +93,7 @@ update_weather.count = 0
 @app.on_event("startup")
 async def startup_event():
     scheduler.add_job(update_weather, DateTrigger(run_date=datetime.now()))
-    scheduler.add_job(update_weather, IntervalTrigger(minutes=6))
+    scheduler.add_job(update_weather, IntervalTrigger(minutes=API_QUERY_INTERVAL))
     scheduler.start()
 
 
