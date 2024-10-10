@@ -15,20 +15,20 @@
 
 	function getTempColor(temp) {
     	    const colors = [
-                { max: -20, color: 'rgba(0, 0, 139, 0.8)' },    // Dark blue
-                { max: -15, color: 'rgba(0, 0, 255, 0.8)' },    // Blue
-                { max: -10, color: 'rgba(70, 130, 180, 0.8)' }, // Steel blue
-                { max: -5, color: 'rgba(135, 206, 235, 0.8)' }, // Sky blue
-                { max: 0, color: 'rgba(173, 216, 230, 0.8)' },  // Light blue
-                { max: 5, color: 'rgba(144, 238, 144, 0.8)' },  // Light green
-                { max: 10, color: 'rgba(60, 179, 113, 0.8)' },  // Medium sea green
-                { max: 15, color: 'rgba(34, 139, 34, 0.8)' },   // Forest green
-                { max: 20, color: 'rgba(173, 255, 47, 0.8)' },  // Yellow-green
-                { max: 25, color: 'rgba(255, 255, 0, 0.8)' },   // Yellow
-                { max: 30, color: 'rgba(255, 165, 0, 0.8)' },   // Orange
-                { max: 35, color: 'rgba(255, 99, 71, 0.8)' },   // Tomato
-                { max: 40, color: 'rgba(255, 69, 0, 0.8)' },    // Orange-red
-                { max: 45, color: 'rgba(255, 0, 0, 0.8)' },     // Red
+                { max: -21, color: 'rgba(0, 0, 139, 0.8)' },    // Dark blue
+                { max: -16, color: 'rgba(0, 0, 255, 0.8)' },    // Blue
+                { max: -11, color: 'rgba(70, 130, 180, 0.8)' }, // Steel blue
+                { max: -6, color: 'rgba(135, 206, 235, 0.8)' }, // Sky blue
+                { max: -1, color: 'rgba(173, 216, 230, 0.8)' }, // Light blue
+                { max: 4, color: 'rgba(144, 238, 144, 0.8)' },  // Light green
+                { max: 9, color: 'rgba(60, 179, 113, 0.8)' },   // Medium sea green
+                { max: 14, color: 'rgba(34, 139, 34, 0.8)' },   // Forest green
+                { max: 19, color: 'rgba(173, 255, 47, 0.8)' },  // Yellow-green
+                { max: 24, color: 'rgba(255, 255, 0, 0.8)' },   // Yellow
+                { max: 29, color: 'rgba(255, 165, 0, 0.8)' },   // Orange
+                { max: 34, color: 'rgba(255, 99, 71, 0.8)' },   // Tomato
+                { max: 39, color: 'rgba(255, 69, 0, 0.8)' },    // Orange-red
+                { max: 44, color: 'rgba(255, 0, 0, 0.8)' },     // Red
                 { max: Infinity, color: 'rgba(139, 0, 0, 0.8)' }// Dark red for > 45
             ];
     
@@ -55,7 +55,7 @@
                 const weatherData = await response.json();
                 weatherData.forEach(city => {
                     let localtime = new Date(city.localtime * 1000);
-                    let timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()}/${localtime.getUTCFullYear() - 2000} ${String(localtime.getUTCHours()).padStart(2, "0")}:${String(localtime.getUTCMinutes()).padStart(2, "0")}`;
+                    let timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()+1}/${localtime.getUTCFullYear() - 2000} ${String(localtime.getUTCHours()).padStart(2, "0")}:${String(localtime.getUTCMinutes()).padStart(2, "0")}`;
 
                     let label = L.divIcon({
                         className: 'temperature-label',
