@@ -63,7 +63,7 @@
                         iconSize: [24, 18]
                     });
 
-                    let content = `<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Time: ${timestr}`;
+                    let content = `<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Last 24Hrs Min: ${city.mintemp}°C<br/>Last 24Hrs Max: ${city.maxtemp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Time: ${timestr}`;
 
                     if(city.name in cities) {
                         cities[city.name].setIcon(label);

@@ -10,7 +10,6 @@ from datetime import datetime
 from cities import cities
 import httpx
 import os
-import math
 
 from pathlib import Path
 
@@ -29,9 +28,11 @@ OPENWEATHERMAP_API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 
 weather_data = {}
 
+# Get 60 locations from API every 6 minutes (max 600 locations per hour)
+# This gives us hourly updates for each location
 MAX_API_CALLS = 60
-API_QUERY_INTERVAL = 5
-BATCHES = math.ceil(len(cities)/MAX_API_CALLS)
+API_QUERY_INTERVAL = 6
+BATCHES = 10
 
 
 @app.get('/favicon.ico', include_in_schema=False)
@@ -72,11 +73,31 @@ async def update_weather():
                 response = await client.get(url)
                 if response.status_code == 200:
                     data = response.json()
+
+                    current_temp = round(data["main"]["temp"])
+
+                    if not (city["name"] in weather_data):
+                        temps24 = [None] * 24
+                        temps24[0] = current_temp
+                    else:
+                        temps24 = [current_temp] + weather_data[city["name"]]["temps24"][:-1]
+
+                    sortedTemps24 = sorted(x for x in temps24 if x is not None)
+                    if (len(sortedTemps24) > 2):
+                        min_temp = sortedTemps24[0]
+                        max_temp = sortedTemps24[-1]
+                    else:
+                        min_temp = current_temp
+                        max_temp = current_temp
+
                     weather_data[city["name"]] = {
                         "name": city["name"],
                         "lat": city["lat"],
                         "lon": city["lon"],
-                        "temp": round(data["main"]["temp"]),
+                        "temp": current_temp,
+                        "temps24": temps24,
+                        "mintemp": min_temp,
+                        "maxtemp": max_temp,
                         "humidity": data["main"]["humidity"],
                         "wind": format_wind(data["wind"]["speed"], data["wind"]["deg"]),
                         "localtime": data["dt"]+data["timezone"],
