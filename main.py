@@ -92,6 +92,7 @@ async def update_weather():
 
                     weather_data[city["name"]] = {
                         "name": city["name"],
+                        "icon": data["weather"][0]["icon"],
                         "lat": city["lat"],
                         "lon": city["lon"],
                         "temp": current_temp,

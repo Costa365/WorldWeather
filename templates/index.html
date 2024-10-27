@@ -26,13 +26,18 @@
                 { max: 19, color: 'rgba(173, 255, 47, 0.8)' },  // Yellow-green
                 { max: 24, color: 'rgba(255, 255, 0, 0.8)' },   // Yellow
                 { max: 29, color: 'rgba(255, 165, 0, 0.8)' },   // Orange
-                { max: 34, color: 'rgba(255, 99, 71, 0.8)' },   // Tomato
+                { max: 34, color: 'rgba(255, 0, 71, 0.8)' },    // Tomato
                 { max: 39, color: 'rgba(255, 69, 0, 0.8)' },    // Orange-red
                 { max: 44, color: 'rgba(255, 0, 0, 0.8)' },     // Red
                 { max: Infinity, color: 'rgba(139, 0, 0, 0.8)' }// Dark red for > 45
             ];
+
+            let fgcolor = 'black';
+            if(temp<=-15 || temp>=45) {
+                fgcolor = 'white';
+            }
     
-            return colors.find(c => temp <= c.max).color;
+            return [colors.find(c => temp <= c.max).color, fgcolor];
         }
 
 
@@ -54,16 +59,16 @@
 
                 const weatherData = await response.json();
                 weatherData.forEach(city => {
-                    let localtime = new Date(city.localtime * 1000);
-                    let timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()+1}/${localtime.getUTCFullYear() - 2000} ${String(localtime.getUTCHours()).padStart(2, "0")}:${String(localtime.getUTCMinutes()).padStart(2, "0")}`;
-
+                    const localtime = new Date(city.localtime * 1000);
+                    const timestr = `${localtime.getUTCDate()}/${localtime.getUTCMonth()+1}/${localtime.getUTCFullYear() - 2000} ${String(localtime.getUTCHours()).padStart(2, "0")}:${String(localtime.getUTCMinutes()).padStart(2, "0")}`;
+                    const [bgcolor, fgcolor] =  getTempColor(city.temp)
                     let label = L.divIcon({
                         className: 'temperature-label',
-                        html: `<div style="background-color: ${getTempColor(city.temp)}; padding: 1px; border-radius: 8px; text-align: center">${city.temp}</div>`,
+                        html: `<div style="background-color: ${bgcolor}; color: ${fgcolor}; padding: 1px; border-radius: 8px; text-align: center">${city.temp}</div>`,
                         iconSize: [24, 18]
                     });
 
-                    let content = `<b>${city.name}</b><br/>Temperature: ${city.temp}°C<br/>Last 24Hrs Min: ${city.mintemp}°C<br/>Last 24Hrs Max: ${city.maxtemp}°C<br/>Humidity: ${city.humidity}%<br/>Weather: ${city.description}<br/>Wind: ${city.wind}<br/>Time: ${timestr}`;
+                    let content = `<b>${city.name}</b><br/><img class="weather-icon" src="http://openweathermap.org/img/wn/${city.icon}@2x.png">(${city.description})<br/>Temperature: ${city.temp}°C<br/>Max (last 24 hours): ${city.maxtemp}°C<br/>Min (last 24 hours): ${city.mintemp}°C<br/>Humidity: ${city.humidity}%<br/>Wind: ${city.wind}<br/>Time: ${timestr}`;
 
                     if(city.name in cities) {
                         cities[city.name].setIcon(label);
