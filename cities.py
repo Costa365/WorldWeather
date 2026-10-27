@@ -494,5 +494,6 @@ cities = [
     {'name': 'Noumea', 'lat': -22.2558, 'lon': 166.4505},
     {'name': 'Christchurch', 'lat': -43.5321, 'lon': 172.6362},
     {'name': 'Auckland', 'lat': -36.8485, 'lon': 174.7633},
-    {'name': 'Suva', 'lat': -18.1416, 'lon': 178.4419}
+    {'name': 'Suva', 'lat': -18.1416, 'lon': 178.4419},
+    {'name': 'Belgrade', 'lat': 44.80401, 'lon': 20.46513}
 ]
